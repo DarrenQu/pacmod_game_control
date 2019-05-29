@@ -137,7 +137,7 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
       turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
     else if (local_enable != prev_enable)
     {
-      if (vehicle_type == VEHICLE_6)
+      if (vehicle_type == VEHICLE_6 || vehicle_type == VEHICLE_7)
         turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
       else
         turn_signal_cmd_pub_msg.command = last_turn_cmd;
@@ -248,7 +248,8 @@ void PublishControlBoardRev3::publish_accelerator_message(const sensor_msgs::Joy
           vehicle_type == LEXUS_RX_450H ||
           vehicle_type == VEHICLE_4 ||
           vehicle_type == VEHICLE_5 ||
-          vehicle_type == VEHICLE_6)
+          vehicle_type == VEHICLE_6 ||
+          vehicle_type == VEHICLE_7)
         accelerator_cmd_pub_msg.command =
           accel_scale_val * (0.5 * (msg->axes[axes[RIGHT_TRIGGER_AXIS]] + 1.0));
       else
@@ -271,7 +272,8 @@ void PublishControlBoardRev3::publish_accelerator_message(const sensor_msgs::Joy
           vehicle_type == LEXUS_RX_450H ||
           vehicle_type == VEHICLE_4 ||
           vehicle_type == VEHICLE_5 ||
-          vehicle_type == VEHICLE_6)
+          vehicle_type == VEHICLE_6 ||
+          vehicle_type == VEHICLE_7)
         accelerator_cmd_pub_msg.command =
           accel_scale_val * (-0.5 * (msg->axes[axes[RIGHT_TRIGGER_AXIS]] - 1.0));
       else
@@ -351,7 +353,8 @@ void PublishControlBoardRev3::publish_lights_horn_wipers_message(const sensor_ms
 {
   if ((vehicle_type == LEXUS_RX_450H ||
        vehicle_type == VEHICLE_5 ||
-       vehicle_type == VEHICLE_6) &&
+       vehicle_type == VEHICLE_6 ||
+       vehicle_type == VEHICLE_7) &&
       controller != HRI_SAFE_REMOTE)
   {
     pacmod_msgs::SystemCmdInt headlight_cmd_pub_msg;

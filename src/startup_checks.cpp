@@ -69,6 +69,8 @@ bool AS::Joystick::check_vehicle_type(ros::NodeHandle * nodeH)
       vehicle_type = VEHICLE_5;
     else if (vehicle_type_string == "VEHICLE_6")
       vehicle_type = VEHICLE_6;
+    else if (vehicle_type_string == "VEHICLE_7")
+      vehicle_type = VEHICLE_7;
     else
     {
       ROS_ERROR("pacmod_vehicle_type is invalid");
