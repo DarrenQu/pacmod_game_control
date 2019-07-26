@@ -22,6 +22,7 @@ PublishControlBoardRev3::PublishControlBoardRev3() :
   turn_sub = n.subscribe("/pacmod/parsed_tx/turn_rpt", 20, &PublishControlBoardRev3::callback_turn_rpt);
 
   // Advertise published messages
+  hazards_cmd_pub = n.advertize<pacmod_msgs::SystemCmdInt>("pacmod/as_rx/hazard_cmd", 20);
   turn_signal_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/turn_cmd", 20);
   headlight_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/headlight_cmd", 20);
   horn_cmd_pub = n.advertise<pacmod_msgs::SystemCmdBool>("/pacmod/as_rx/horn_cmd", 20);
@@ -93,6 +94,46 @@ void PublishControlBoardRev3::publish_steering_message(const sensor_msgs::Joy::C
   steering_set_position_with_speed_limit_pub.publish(steer_msg);
 }
 
+void PublishControlBoardRev3::publish_hazards_message(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  pacmod_msgs::SystemCmdInt hazards_cmd_pub_msg;
+
+  hazards_cmd_pub_msg.enable = local_enable;
+  hazards_cmd_pub_msg.ignore_overrides = false;
+
+  // If the enable flag just went to true, send an override clear
+  if(!prev_enable && local_enable)
+  {
+    hazards_cmd_pub_msg.clear_override = true;
+    hazards_cmd_pub_msg.clear_faults = true;
+  }
+
+  if(controller == HRI_SAFE_REMOTE)
+  {
+    if(msg->axes[2] < -0.5)
+      hazards_cmd_pub_msg.command = SIGNAL_HAZARD;
+    else
+      hazards_cmd_pub_msg.command = SIGNAL_OFF;
+
+    if(last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
+    {
+      hazards_cmd_pub.publish(hazards_cmd_pub_msg);
+    }
+  }
+  else
+  {
+    if(msg->axes[DPAD_UD] == AXES_MIN)
+      hazards_cmd_pub_msg.command = SIGNAL_HAZARD;
+    else
+      hazards_cmd_pub_msg.command = SIGNAL_OFF;
+    
+    if(last_axes.empty() || last_axes(DPAD_LR) != msg->axes[DPAD_LR] || local_enable != prev_enable)
+    {
+      hazards_cmd_pub.publish(hazards_cmd_pub_msg);
+    }
+  }
+}
+
 void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy::ConstPtr& msg)
 {
   pacmod_msgs::SystemCmdInt turn_signal_cmd_pub_msg;
@@ -112,15 +153,28 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
   {
     // Axis 2 is the "left trigger" and axis 5 is the "right trigger" single
     // axis joysticks on the back of the controller
-    if (msg->axes[2] < -0.5)
-      turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
-    else if (msg->axes[5] > 0.5)
-      turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
-    else if (msg->axes[5] < -0.5)
-      turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
-    else
-      turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
 
+    if(vehicle_type != VEHICLE_9)
+    {
+      if (msg->axes[2] < -0.5)
+        turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
+      else if (msg->axes[5] > 0.5)
+        turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
+      else if (msg->axes[5] < -0.5)
+        turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
+      else
+        turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+    }
+    else
+    {
+      if (msg->axes[5] > 0.5)
+        turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
+      else if (msg->axes[5] < -0.5)
+        turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
+      else
+        turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+    }
+    
     if (last_axes.empty() ||
         last_axes[2] != msg->axes[2] ||
         last_axes[5] != msg->axes[5] ||
@@ -129,21 +183,42 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
   }
   else  // Every other controller
   {
-    if (msg->axes[axes[DPAD_LR]] == AXES_MAX)
-      turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
-    else if (msg->axes[axes[DPAD_LR]] == AXES_MIN)
-      turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
-    else if (msg->axes[axes[DPAD_UD]] == AXES_MIN)
-      turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
-    else if (local_enable != prev_enable)
+
+    if(vehicle_type != VEHICLE_9)
     {
-      if (vehicle_type == VEHICLE_6)
-        turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+      if (msg->axes[axes[DPAD_LR]] == AXES_MAX)
+        turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
+      else if (msg->axes[axes[DPAD_LR]] == AXES_MIN)
+        turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
+      else if (msg->axes[axes[DPAD_UD]] == AXES_MIN)
+        turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
+      else if (local_enable != prev_enable)
+      {
+        if (vehicle_type == VEHICLE_6)
+          turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+        else
+          turn_signal_cmd_pub_msg.command = last_turn_cmd;
+      }
       else
-        turn_signal_cmd_pub_msg.command = last_turn_cmd;
+        turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
     }
     else
-      turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+    {
+      if (msg->axes[axes[DPAD_LR]] == AXES_MAX)
+        turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
+      else if (msg->axes[axes[DPAD_LR]] == AXES_MIN)
+        turn_signal_cmd_pub_msg.command = SIGNAL_RIGHT;
+      else if (local_enable != prev_enable)
+      {
+        if (vehicle_type == VEHICLE_6)
+          turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+        else
+          turn_signal_cmd_pub_msg.command = last_turn_cmd;
+      }
+      else
+        turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
+    }
+    
 
     if (last_axes.empty() ||
         last_axes[axes[DPAD_LR]] != msg->axes[axes[DPAD_LR]] ||
