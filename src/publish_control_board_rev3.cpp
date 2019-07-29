@@ -153,7 +153,7 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
     // Axis 2 is the "left trigger" and axis 5 is the "right trigger" single
     // axis joysticks on the back of the controller
 
-    if(vehicle_type != VEHICLE_9)
+    if (vehicle_type != VEHICLE_9)
     {
       if (msg->axes[2] < -0.5)
         turn_signal_cmd_pub_msg.command = SIGNAL_HAZARD;
