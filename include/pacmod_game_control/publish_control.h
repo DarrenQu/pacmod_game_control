@@ -83,6 +83,7 @@ class PublishControl
   private:
     // private functions
     virtual void publish_steering_message(const sensor_msgs::Joy::ConstPtr& msg) = 0;
+    virtual void publish_hazards_message(const sensor_msgs::Joy::ConstPtr& msg) = 0;
     virtual void publish_turn_signal_message(const sensor_msgs::Joy::ConstPtr& msg) = 0;
     virtual void publish_shifting_message(const sensor_msgs::Joy::ConstPtr& msg) = 0;
     virtual void publish_accelerator_message(const sensor_msgs::Joy::ConstPtr& msg) = 0;
