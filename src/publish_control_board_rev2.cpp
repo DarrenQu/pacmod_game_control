@@ -62,6 +62,46 @@ void PublishControlBoardRev2::publish_steering_message(const sensor_msgs::Joy::C
   steering_set_position_with_speed_limit_pub.publish(steer_msg);
 }
 
+void PublishControlBoardRev3::publish_hazards_message(const sensor_msgs::Joy::ConstPtr& msg)
+{
+  pacmod_msgs::SystemCmdInt hazards_cmd_pub_msg;
+
+  hazards_cmd_pub_msg.enable = local_enable;
+  hazards_cmd_pub_msg.ignore_overrides = false;
+
+  // If the enable flag just went to true, send an override clear
+  if(!prev_enable && local_enable)
+  {
+    hazards_cmd_pub_msg.clear_override = true;
+    hazards_cmd_pub_msg.clear_faults = true;
+  }
+
+  if(controller == HRI_SAFE_REMOTE)
+  {
+    if(msg->axes[2] < -0.5)
+      hazards_cmd_pub_msg.command = HAZARD_ON;
+    else
+      hazards_cmd_pub_msg.command = HAZARD_OFF;
+
+    if(last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
+    {
+      hazards_cmd_pub.publish(hazards_cmd_pub_msg);
+    }
+  }
+  else
+  {
+    if(msg->axes[DPAD_UD] == AXES_MIN)
+      hazards_cmd_pub_msg.command = HAZARD_ON;
+    else
+      hazards_cmd_pub_msg.command = HAZARD_OFF;
+    
+    if(last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
+    {
+      hazards_cmd_pub.publish(hazards_cmd_pub_msg);
+    }
+  }
+}
+
 void PublishControlBoardRev2::publish_turn_signal_message(const sensor_msgs::Joy::ConstPtr& msg)
 {
   pacmod_msgs::PacmodCmd turn_signal_cmd_pub_msg;
