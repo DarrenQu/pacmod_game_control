@@ -55,6 +55,7 @@ class PublishControl
     ros::NodeHandle n;
 
     // ROS publishers
+    ros::Publisher hazards_cmd_pub;
     ros::Publisher turn_signal_cmd_pub;
     ros::Publisher headlight_cmd_pub;
     ros::Publisher horn_cmd_pub;

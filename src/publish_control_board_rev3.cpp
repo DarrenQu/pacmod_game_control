@@ -22,7 +22,7 @@ PublishControlBoardRev3::PublishControlBoardRev3() :
   turn_sub = n.subscribe("/pacmod/parsed_tx/turn_rpt", 20, &PublishControlBoardRev3::callback_turn_rpt);
 
   // Advertise published messages
-  hazards_cmd_pub = n.advertize<pacmod_msgs::SystemCmdInt>("pacmod/as_rx/hazard_cmd", 20);
+  hazards_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/hazards_cmd", 20);
   turn_signal_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/turn_cmd", 20);
   headlight_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/headlight_cmd", 20);
   horn_cmd_pub = n.advertise<pacmod_msgs::SystemCmdBool>("/pacmod/as_rx/horn_cmd", 20);
@@ -111,9 +111,9 @@ void PublishControlBoardRev3::publish_hazards_message(const sensor_msgs::Joy::Co
   if(controller == HRI_SAFE_REMOTE)
   {
     if(msg->axes[2] < -0.5)
-      hazards_cmd_pub_msg.command = SIGNAL_HAZARD;
+      hazards_cmd_pub_msg.command = HAZARD_ON;
     else
-      hazards_cmd_pub_msg.command = SIGNAL_OFF;
+      hazards_cmd_pub_msg.command = HAZARD_OFF;
 
     if(last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
     {
@@ -123,11 +123,11 @@ void PublishControlBoardRev3::publish_hazards_message(const sensor_msgs::Joy::Co
   else
   {
     if(msg->axes[DPAD_UD] == AXES_MIN)
-      hazards_cmd_pub_msg.command = SIGNAL_HAZARD;
+      hazards_cmd_pub_msg.command = HAZARD_ON;
     else
-      hazards_cmd_pub_msg.command = SIGNAL_OFF;
+      hazards_cmd_pub_msg.command = HAZARD_OFF;
     
-    if(last_axes.empty() || last_axes(DPAD_LR) != msg->axes[DPAD_LR] || local_enable != prev_enable)
+    if(last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
     {
       hazards_cmd_pub.publish(hazards_cmd_pub_msg);
     }
