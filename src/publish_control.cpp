@@ -57,7 +57,7 @@ void PublishControl::callback_control(const sensor_msgs::Joy::ConstPtr& msg)
       publish_steering_message(msg);
 
       // Hazards
-      if(vehicle_type == VEHICLE_9)
+      if (vehicle_type == VEHICLE_9)
       {
         publish_hazards_message(msg);
       }

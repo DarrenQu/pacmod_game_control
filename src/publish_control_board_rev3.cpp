@@ -102,32 +102,31 @@ void PublishControlBoardRev3::publish_hazards_message(const sensor_msgs::Joy::Co
   hazards_cmd_pub_msg.ignore_overrides = false;
 
   // If the enable flag just went to true, send an override clear
-  if(!prev_enable && local_enable)
+  if (!prev_enable && local_enable)
   {
     hazards_cmd_pub_msg.clear_override = true;
     hazards_cmd_pub_msg.clear_faults = true;
   }
 
-  if(controller == HRI_SAFE_REMOTE)
+  if (controller == HRI_SAFE_REMOTE)
   {
-    if(msg->axes[2] < -0.5)
+    if (msg->axes[2] < -0.5)
       hazards_cmd_pub_msg.command = HAZARD_ON;
     else
       hazards_cmd_pub_msg.command = HAZARD_OFF;
 
-    if(last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
+    if (last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
     {
       hazards_cmd_pub.publish(hazards_cmd_pub_msg);
     }
   }
   else
   {
-    if(msg->axes[DPAD_UD] == AXES_MIN)
+    if (msg->axes[DPAD_UD] == AXES_MIN)
       hazards_cmd_pub_msg.command = HAZARD_ON;
     else
       hazards_cmd_pub_msg.command = HAZARD_OFF;
-    
-    if(last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
+    if (last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
     {
       hazards_cmd_pub.publish(hazards_cmd_pub_msg);
     }
@@ -174,7 +173,6 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
       else
         turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
     }
-    
     if (last_axes.empty() ||
         last_axes[2] != msg->axes[2] ||
         last_axes[5] != msg->axes[5] ||
@@ -183,8 +181,7 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
   }
   else  // Every other controller
   {
-
-    if(vehicle_type != VEHICLE_9)
+    if (vehicle_type != VEHICLE_9)
     {
       if (msg->axes[axes[DPAD_LR]] == AXES_MAX)
         turn_signal_cmd_pub_msg.command = SIGNAL_LEFT;
@@ -218,8 +215,6 @@ void PublishControlBoardRev3::publish_turn_signal_message(const sensor_msgs::Joy
       else
         turn_signal_cmd_pub_msg.command = SIGNAL_OFF;
     }
-    
-
     if (last_axes.empty() ||
         last_axes[axes[DPAD_LR]] != msg->axes[axes[DPAD_LR]] ||
         last_axes[axes[DPAD_UD]] != msg->axes[axes[DPAD_UD]] ||
@@ -324,7 +319,7 @@ void PublishControlBoardRev3::publish_accelerator_message(const sensor_msgs::Joy
           vehicle_type == VEHICLE_4 ||
           vehicle_type == VEHICLE_5 ||
           vehicle_type == VEHICLE_6 ||
-	        vehicle_type == VEHICLE_9)
+          vehicle_type == VEHICLE_9)
         accelerator_cmd_pub_msg.command =
           accel_scale_val * (0.5 * (msg->axes[axes[RIGHT_TRIGGER_AXIS]] + 1.0));
       else
@@ -348,7 +343,7 @@ void PublishControlBoardRev3::publish_accelerator_message(const sensor_msgs::Joy
           vehicle_type == VEHICLE_4 ||
           vehicle_type == VEHICLE_5 ||
           vehicle_type == VEHICLE_6 ||
-	        vehicle_type == VEHICLE_9)
+          vehicle_type == VEHICLE_9)
         accelerator_cmd_pub_msg.command =
           accel_scale_val * (-0.5 * (msg->axes[axes[RIGHT_TRIGGER_AXIS]] - 1.0));
       else
@@ -496,7 +491,7 @@ void PublishControlBoardRev3::publish_lights_horn_wipers_message(const sensor_ms
   }
 
   if ((vehicle_type == INTERNATIONAL_PROSTAR ||
-        vehicle_type == VEHICLE_9) && 
+        vehicle_type == VEHICLE_9) &&
         controller != HRI_SAFE_REMOTE)  // Semi
   {
     pacmod_msgs::SystemCmdInt wiper_cmd_pub_msg;

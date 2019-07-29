@@ -66,26 +66,24 @@ void PublishControlBoardRev2::publish_hazards_message(const sensor_msgs::Joy::Co
 {
   pacmod_msgs::PacmodCmd hazards_cmd_pub_msg;
 
-  if(controller == HRI_SAFE_REMOTE)
+  if (controller == HRI_SAFE_REMOTE)
   {
-    if(msg->axes[2] < -0.5)
+    if (msg->axes[2] < -0.5)
       hazards_cmd_pub_msg.ui16_cmd = HAZARD_ON;
     else
       hazards_cmd_pub_msg.ui16_cmd = HAZARD_OFF;
-
-    if(last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
+    if (last_axes.empty() || last_axes[2] != msg->axes[2] || local_enable != prev_enable)
     {
       hazards_cmd_pub.publish(hazards_cmd_pub_msg);
     }
   }
   else
   {
-    if(msg->axes[DPAD_UD] == AXES_MIN)
+    if (msg->axes[DPAD_UD] == AXES_MIN)
       hazards_cmd_pub_msg.ui16_cmd = HAZARD_ON;
     else
       hazards_cmd_pub_msg.ui16_cmd = HAZARD_OFF;
-    
-    if(last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
+    if (last_axes.empty() || last_axes[DPAD_UD] != msg->axes[DPAD_UD] || local_enable != prev_enable)
     {
       hazards_cmd_pub.publish(hazards_cmd_pub_msg);
     }
