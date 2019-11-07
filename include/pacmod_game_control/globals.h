@@ -42,9 +42,9 @@ enum TurnSignalState
 
 enum DoorSignalState
 {
-  SLIDING_DOOR_NEUTRAL,
-  SLIDING_DOOR_OPEN,
-  SLIDING_DOOR_CLOSE
+  REAR_PASS_DOOR_NEUTRAL,
+  REAR_PASS_DOOR_OPEN,
+  REAR_PASS_DOOR_CLOSE
 };
 
 enum GamepadType
@@ -132,7 +132,7 @@ static std::mutex speed_mutex;
 static std::mutex state_change_mutex;
 static std::mutex shift_mutex;
 static std::mutex turn_mutex;
-static std::mutex door_mutex;
+static std::mutex rear_pass_door_mutex;
 
 }  // namespace Joystick
 }  // namespace AS
