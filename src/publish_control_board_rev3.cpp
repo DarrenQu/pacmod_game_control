@@ -21,7 +21,8 @@ PublishControlBoardRev3::PublishControlBoardRev3() :
   enable_sub = n.subscribe("/pacmod/as_tx/enabled", 20, &PublishControl::callback_pacmod_enable);
   shift_sub = n.subscribe("/pacmod/parsed_tx/shift_rpt", 20, &PublishControlBoardRev3::callback_shift_rpt);
   turn_sub = n.subscribe("/pacmod/parsed_tx/turn_rpt", 20, &PublishControlBoardRev3::callback_turn_rpt);
-  rear_pass_door_sub = n.subscribe("/pacmod/parsed_tx/rear_pass_door_rpt", 20, &PublishControlBoardRev3::callback_rear_pass_door_rpt);
+  rear_pass_door_sub = n.subscribe("/pacmod/parsed_tx/rear_pass_door_rpt",
+                                   20, &PublishControlBoardRev3::callback_rear_pass_door_rpt);
 
   // Advertise published messages
   turn_signal_cmd_pub = n.advertise<pacmod_msgs::SystemCmdInt>("/pacmod/as_rx/turn_cmd", 20);
