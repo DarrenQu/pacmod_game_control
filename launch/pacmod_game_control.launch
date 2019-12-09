@@ -12,7 +12,7 @@
   <arg name="pacmod_board_rev" value="2" unless="$(arg is_pacmod_3)" />
   <arg name="pacmod_board_rev" value="3" if="$(arg is_pacmod_3)" />
 
-  <arg name="pacmod_can_hardware_id" default="43029" />
+  <arg name="pacmod_can_hardware_id" default="031231" />
 
   <arg name="pacmod_can_circuit_id" default="0" />
   <arg name="pacmod_socketcan_device" default="can0" />
@@ -47,7 +47,7 @@
   <arg name="brake_scale_val" default="1.0"/>
 
   <!-- For GEM, 11.176m/s -->
-  <arg name="max_veh_speed" default="11.176" />
+  <arg name="max_veh_speed" default="50" />
 
   <group unless="$(arg is_pacmod_3)">
     <include file="$(find pacmod)/launch/pacmod.launch" if="$(arg launch_pacmod)" ns="pacmod">
